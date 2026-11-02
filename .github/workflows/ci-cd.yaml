@@ -1,0 +1,31 @@
+name: Wisecow CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Login to ACR
+        run: az acr login --name wisecowacr2014
+
+      - name: Build Docker Image
+        run: |
+          docker build -t wisecowacr2014.azurecr.io/wisecow:v1 .
+
+      - name: Push Docker Image
+        run: |
+          docker push wisecowacr2014.azurecr.io/wisecow:v1
